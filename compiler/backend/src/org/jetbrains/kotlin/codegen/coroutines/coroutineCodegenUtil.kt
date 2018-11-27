@@ -510,3 +510,21 @@ val EXPERIMENTAL_CONTINUATION_ASM_TYPE = DescriptorUtils.CONTINUATION_INTERFACE_
 
 @JvmField
 val RELEASE_CONTINUATION_ASM_TYPE = DescriptorUtils.CONTINUATION_INTERFACE_FQ_NAME_RELEASE.topLevelClassAsmType()
+
+fun putSuspendLocalFunctionOnStack(codegen: ExpressionCodegen, typeMapper: KotlinTypeMapper, d: SimpleFunctionDescriptor): StackValue {
+    val bindingContext = codegen.bindingContext
+    val localType = CodegenBinding.asmTypeForAnonymousClass(bindingContext, d)
+    val callableClass = bindingContext[CodegenBinding.CLASS_FOR_CALLABLE, d] ?: error("No CLASS_FOR_CALLABLE $d")
+    val closure = bindingContext[CodegenBinding.CLOSURE, callableClass] ?: error("No CLOSURE $d")
+    with(codegen.v) {
+        anew(localType)
+        dup()
+        codegen.pushClosureOnStack(callableClass, true, codegen.defaultCallGenerator, null)
+        val languageVersionSettings = codegen.state.languageVersionSettings
+        val params = ClosureCodegen.calculateConstructorParameters(typeMapper, languageVersionSettings, closure, localType)
+        val paramTypes = params.map { it.fieldType }.plus(languageVersionSettings.continuationAsmType())
+        val constructorDescriptor = Type.getMethodDescriptor(Type.VOID_TYPE, *paramTypes.toTypedArray())
+        invokespecial(localType.internalName, "<init>", constructorDescriptor, false)
+    }
+    return StackValue.onStack(localType)
+}

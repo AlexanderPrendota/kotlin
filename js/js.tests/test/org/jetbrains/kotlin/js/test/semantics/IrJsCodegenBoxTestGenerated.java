@@ -6166,6 +6166,11 @@ public class IrJsCodegenBoxTestGenerated extends AbstractIrJsCodegenBoxTest {
                     runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/localFunctions/named/nestedLocals.kt", "kotlin.coroutines");
                 }
 
+                @TestMetadata("rec.kt")
+                public void testRec_1_3() throws Exception {
+                    runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/localFunctions/named/rec.kt", "kotlin.coroutines");
+                }
+
                 @TestMetadata("simpleSuspensionPoint.kt")
                 public void testSimpleSuspensionPoint_1_3() throws Exception {
                     runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/localFunctions/named/simpleSuspensionPoint.kt", "kotlin.coroutines");
