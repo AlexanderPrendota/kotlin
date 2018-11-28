@@ -7,6 +7,7 @@
     <properties>
         <maven.version>3.0.5</maven.version>
         <sam.src>${basedir}/../../../plugins/sam-with-receiver/sam-with-receiver-cli/src</sam.src>
+        <sam.resources>${basedir}/../../../plugins/sam-with-receiver/sam-with-receiver-cli/resources</sam.resources>
         <sam.maven.plugin.src>${basedir}/src/main/kotlin</sam.maven.plugin.src>
         <sam.maven.plugin.resources>${basedir}/src/main/resources</sam.maven.plugin.resources>
         <sam.target-src>${basedir}/target/src/main/kotlin</sam.target-src>
@@ -75,7 +76,7 @@
                         <configuration>
                             <outputDirectory>${sam.target-resources}/META-INF</outputDirectory>
                             <resources>
-                                <resource><directory>${sam.src}/META-INF</directory></resource>
+                                <resource><directory>${sam.resources}/META-INF</directory></resource>
                                 <resource><directory>${sam.maven.plugin.resources}/META-INF</directory></resource>
                             </resources>
                         </configuration>

@@ -7,6 +7,7 @@
     <properties>
         <maven.version>3.0.5</maven.version>
         <noarg.src>${basedir}/../../../plugins/noarg/noarg-cli/src</noarg.src>
+        <noarg.resources>${basedir}/../../../plugins/noarg/noarg-cli/src</noarg.resources>
         <noarg.maven.plugin.src>${basedir}/src/main/kotlin</noarg.maven.plugin.src>
         <noarg.maven.plugin.resources>${basedir}/src/main/resources</noarg.maven.plugin.resources>
         <noarg.target-src>${basedir}/target/src/main/kotlin</noarg.target-src>
@@ -61,7 +62,7 @@
                         <configuration>
                             <outputDirectory>${noarg.target-src}</outputDirectory>
                             <resources>
-                                <resource><directory>${noarg.src}</directory></resource>
+                                <resource><directory>${noarg.resources}</directory></resource>
                                 <resource><directory>${noarg.maven.plugin.src}</directory></resource>
                             </resources>
                         </configuration>

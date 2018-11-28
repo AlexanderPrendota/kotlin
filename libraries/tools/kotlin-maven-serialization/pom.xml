@@ -7,6 +7,7 @@
     <properties>
         <maven.version>3.0.5</maven.version>
         <serialization.src>${basedir}/../../../plugins/kotlin-serialization/kotlin-serialization-compiler/src/</serialization.src>
+        <serialization.resources>${basedir}/../../../plugins/kotlin-serialization/kotlin-serialization-compiler/resources/</serialization.resources>
         <serialization.src.kt>${basedir}/../../../plugins/kotlin-serialization/kotlin-serialization-compiler/src/org/jetbrains/kotlinx/serialization/compiler</serialization.src.kt>
         <serialization.maven.plugin.src>${basedir}/src/main/kotlin</serialization.maven.plugin.src>
         <serialization.maven.plugin.resources>${basedir}/src/main/resources</serialization.maven.plugin.resources>
@@ -90,7 +91,7 @@
                         <configuration>
                             <outputDirectory>${serialization.target-resources}/META-INF</outputDirectory>
                             <resources>
-                                <resource><directory>${serialization.src}/META-INF</directory></resource>
+                                <resource><directory>${serialization.resources}/META-INF</directory></resource>
                                 <resource><directory>${serialization.maven.plugin.resources}/META-INF</directory></resource>
                             </resources>
                         </configuration>

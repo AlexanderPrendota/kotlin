@@ -7,6 +7,7 @@
     <properties>
         <maven.version>3.0.5</maven.version>
         <allopen.src>${basedir}/../../../plugins/allopen/allopen-cli/src</allopen.src>
+        <allopen.resources>${basedir}/../../../plugins/allopen/allopen-cli/resources</allopen.resources>
         <allopen.maven.plugin.src>${basedir}/src/main/kotlin</allopen.maven.plugin.src>
         <allopen.maven.plugin.resources>${basedir}/src/main/resources</allopen.maven.plugin.resources>
         <allopen.target-src>${basedir}/target/src/main/kotlin</allopen.target-src>
@@ -61,7 +62,7 @@
                         <configuration>
                             <outputDirectory>${allopen.target-src}</outputDirectory>
                             <resources>
-                                <resource><directory>${allopen.src}</directory></resource>
+                                <resource><directory>${allopen.resources}</directory></resource>
                                 <resource><directory>${allopen.maven.plugin.src}</directory></resource>
                             </resources>
                         </configuration>
