@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.builtins.isBuiltinFunctionalType
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding
 import org.jetbrains.kotlin.codegen.inline.addFakeContinuationMarker
+import org.jetbrains.kotlin.codegen.inline.addRecursiveSuspendLocalFunctionMarker
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.config.*
@@ -517,6 +518,7 @@ fun putSuspendLocalFunctionOnStack(codegen: ExpressionCodegen, typeMapper: Kotli
     val callableClass = bindingContext[CodegenBinding.CLASS_FOR_CALLABLE, d] ?: error("No CLASS_FOR_CALLABLE $d")
     val closure = bindingContext[CodegenBinding.CLOSURE, callableClass] ?: error("No CLOSURE $d")
     with(codegen.v) {
+        addRecursiveSuspendLocalFunctionMarker(this)
         anew(localType)
         dup()
         codegen.pushClosureOnStack(callableClass, true, codegen.defaultCallGenerator, null)

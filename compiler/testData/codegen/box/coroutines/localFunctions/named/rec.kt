@@ -11,9 +11,12 @@ fun builder(c: suspend () -> Unit) {
 }
 
 suspend fun foo(until: Int): String {
+    val o = "O"
+    val k = "K"
+    val dot = "."
     suspend fun bar(x: Int): String =
-        if (x == until) "OK" else bar(x + 1)
-    return bar(0)
+        if (x == until) dot else if (x > until) k + bar(x - 1) else o + bar(x * 2)
+    return bar(1)
 }
 
 fun box(): String {
@@ -21,5 +24,6 @@ fun box(): String {
     builder {
         res = foo(10)
     }
-    return res
+    if (res != "OOOOKKKKKK.") return res
+    return "OK"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -83,6 +83,7 @@ private const val INLINE_MARKER_RETURNS_UNIT = 2
 private const val INLINE_MARKER_FAKE_CONTINUATION = 3
 private const val INLINE_MARKER_BEFORE_FAKE_CONTINUATION_CONSTRUCTOR_CALL = 4
 private const val INLINE_MARKER_AFTER_FAKE_CONTINUATION_CONSTRUCTOR_CALL = 5
+private const val INLINE_MARKER_SUSPEND_LOCAL_FUNCTION_RECURSIVE_CONSTRUCTOR_CALL = 6
 private val INTRINSIC_ARRAY_CONSTRUCTOR_TYPE = AsmUtil.asmTypeByClassId(classId)
 
 internal fun getMethodNode(
@@ -430,6 +431,10 @@ internal fun addFakeContinuationConstructorCallMarker(v: InstructionAdapter, isS
     v.emitInlineMarker(if (isStartNotEnd) INLINE_MARKER_BEFORE_FAKE_CONTINUATION_CONSTRUCTOR_CALL else INLINE_MARKER_AFTER_FAKE_CONTINUATION_CONSTRUCTOR_CALL)
 }
 
+fun addRecursiveSuspendLocalFunctionMarker(v: InstructionAdapter) {
+    v.emitInlineMarker(INLINE_MARKER_SUSPEND_LOCAL_FUNCTION_RECURSIVE_CONSTRUCTOR_CALL)
+}
+
 private fun addReturnsUnitMarker(v: InstructionAdapter) {
     v.emitInlineMarker(INLINE_MARKER_RETURNS_UNIT)
 }
@@ -462,6 +467,9 @@ internal fun isBeforeFakeContinuationConstructorCallMarker(insn: AbstractInsnNod
     isSuspendMarker(insn, INLINE_MARKER_BEFORE_FAKE_CONTINUATION_CONSTRUCTOR_CALL)
 internal fun isAfterFakeContinuationConstructorCallMarker(insn: AbstractInsnNode) =
     isSuspendMarker(insn, INLINE_MARKER_AFTER_FAKE_CONTINUATION_CONSTRUCTOR_CALL)
+
+internal fun isRecursiveSuspendLocalFunctionMarker(insn: AbstractInsnNode) =
+    isSuspendMarker(insn, INLINE_MARKER_SUSPEND_LOCAL_FUNCTION_RECURSIVE_CONSTRUCTOR_CALL)
 
 private fun isSuspendMarker(insn: AbstractInsnNode, id: Int) =
     isInlineMarker(insn, "mark") && insn.previous.intConstant == id

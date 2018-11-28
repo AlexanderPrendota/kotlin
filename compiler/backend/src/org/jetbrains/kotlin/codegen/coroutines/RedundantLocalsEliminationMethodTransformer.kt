@@ -92,14 +92,6 @@ class RedundantLocalsEliminationMethodTransformer(private val languageVersionSet
         return if (aload == succ) aload else null
     }
 
-    private fun AbstractInsnNode.clone() = when (this) {
-        is FieldInsnNode -> FieldInsnNode(opcode, owner, name, desc)
-        is VarInsnNode -> VarInsnNode(opcode, `var`)
-        is InsnNode -> InsnNode(opcode)
-        is TypeInsnNode -> TypeInsnNode(opcode, desc)
-        else -> error("clone of $this is not implemented yet")
-    }
-
     // Remove
     //  ALOAD N
     //  POP
@@ -221,4 +213,13 @@ class RedundantLocalsEliminationMethodTransformer(private val languageVersionSet
         assert(this is VarInsnNode)
         return (this as VarInsnNode).`var`
     }
+}
+
+internal fun AbstractInsnNode.clone() = when (this) {
+    is FieldInsnNode -> FieldInsnNode(opcode, owner, name, desc)
+    is MethodInsnNode -> MethodInsnNode(opcode, owner, name, desc, itf)
+    is VarInsnNode -> VarInsnNode(opcode, `var`)
+    is InsnNode -> InsnNode(opcode)
+    is TypeInsnNode -> TypeInsnNode(opcode, desc)
+    else -> error("clone of $this is not implemented yet")
 }

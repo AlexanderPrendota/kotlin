@@ -88,6 +88,8 @@ class CoroutineTransformerMethodVisitor(
             if (isForNamedFunction) getLastParameterIndex(methodNode.desc, methodNode.access) else 0
         )
 
+        fixRecursiveLocalSuspendFunctionConstructorCalls(methodNode)
+
         FixStackMethodTransformer().transform(containingClassInternalName, methodNode)
         RedundantLocalsEliminationMethodTransformer(languageVersionSettings).transform(containingClassInternalName, methodNode)
         if (languageVersionSettings.isReleaseCoroutines()) {
@@ -194,6 +196,58 @@ class CoroutineTransformerMethodVisitor(
 
         if (languageVersionSettings.isReleaseCoroutines() && !isCrossinlineLambda) {
             writeDebugMetadata(methodNode, suspensionPointLineNumbers, spilledToVariableMapping)
+        }
+    }
+
+    // During codegen, we can emit incorrect recursive constructor calls, if we did not cover all of the captured variables.
+    // To fix this, just replace all of incorrect ones with correct.
+    // This is safe, since we generate the following sequence:
+    //  NEW <className>
+    //  DUP
+    //  ALOAD 0
+    //  GETFIELD <field1>
+    //  ALOAD 0
+    //  GETFIELD <field2>
+    //  ...
+    //  ACONST_NULL
+    //  INVOKESPECIAL <className>.init(...LContinuation;)V
+    // As you can see, we put only fields to stack.
+    private fun fixRecursiveLocalSuspendFunctionConstructorCalls(methodNode: MethodNode) {
+        val markers = methodNode.instructions.asSequence().filter { isRecursiveSuspendLocalFunctionMarker(it) }.toList()
+        if (markers.isEmpty()) return
+        val constrCalls = hashMapOf<AbstractInsnNode, List<AbstractInsnNode>>()
+        for (marker in markers) {
+            val constrCall = arrayListOf<AbstractInsnNode>()
+            var current = marker.next.sure {
+                "recursive constructor marker does not prepend constructor call at " +
+                        "${methodNode.name}:${methodNode.instructions.indexOf(marker)}"
+            }
+            while (current.opcode != Opcodes.INVOKESPECIAL) {
+                constrCall.add(current)
+                current = current.next
+            }
+            constrCall.add(current)
+            constrCalls[marker] = constrCall
+        }
+        val correctSequence= constrCalls.maxBy { it.value.size }?.value ?: error("No constructor marker at ${methodNode.name}")
+        val incorrect = constrCalls.filter { it.value.size < correctSequence.size }
+
+        // replace incorrect sequence with correct one
+        for ((marker, _) in incorrect) {
+            val replacement = correctSequence.map { it.clone() }
+            var current = marker
+            for (insn in replacement) {
+                methodNode.instructions.insert(current, insn)
+                current = current.next
+            }
+        }
+
+        // cleanup
+        for (marker in markers) {
+            methodNode.instructions.removeAll(arrayListOf(marker.previous, marker))
+        }
+        for ((_, incorrectSequence) in incorrect) {
+            methodNode.instructions.removeAll(incorrectSequence)
         }
     }
 
